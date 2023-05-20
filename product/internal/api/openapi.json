@@ -1,0 +1,847 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Yandex Lavka",
+    "version": "1.0"
+  },
+  "paths": {
+    "/orders": {
+      "get": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "getOrders",
+        "parameters": [
+            {
+              "name": "limit",
+              "in": "query",
+              "description": "Максимальное количество заказов в выдаче. Если параметр не передан, то значение по умолчанию равно 1.",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "example": 10
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "description": "Количество заказов, которое нужно пропустить для отображения текущей страницы. Если параметр не передан, то значение по умолчанию равно 0.",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "example": 0
+            }
+          ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "createOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/complete": {
+      "post": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "completeOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteOrderRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/assign": {
+      "post": {
+        "tags": [
+          "order-controller"
+        ],
+        "summary": "Распределение заказов по курьерам",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Дата распределения заказов. Если не указана, то используется текущий день",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "description": "Для распределения заказов между курьерами учитываются следующие параметры: <ul><li>вес заказа</li><li>регион доставки</li><li>стоимость доставки</li></ul>",
+        "operationId": "ordersAssign",
+        "responses": {
+          "201": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderAssignResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/couriers/assignments": {
+      "get": {
+        "summary": "Список распределенных заказов",
+        "tags": [
+          "courier-controller"
+        ],
+        "operationId": "couriersAssignments",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Дата распределения заказов. Если не указана, то используется текущий день",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "courier_id",
+            "in": "query",
+            "description": "Идентификатор курьера для получения списка распредленных заказов. Если не указан, возвращаются данные по всем курьерам.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderAssignResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/couriers": {
+      "get": {
+        "tags": [
+          "courier-controller"
+        ],
+        "operationId": "getCouriers",
+        "parameters": [
+            {
+              "name": "limit",
+              "in": "query",
+              "description": "Максимальное количество курьеров в выдаче. Если параметр не передан, то значение по умолчанию равно 1.",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "example": 10
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "description": "Количество курьеров, которое нужно пропустить для отображения текущей страницы. Если параметр не передан, то значение по умолчанию равно 0.",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "example": 0
+            }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCouriersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "courier-controller"
+        ],
+        "operationId": "createCourier",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCourierRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCouriersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{order_id}": {
+      "get": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "getOrder",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "Order identifier",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/couriers/{courier_id}": {
+      "get": {
+        "tags": [
+          "courier-controller"
+        ],
+        "operationId": "getCourierById",
+        "parameters": [
+          {
+            "name": "courier_id",
+            "in": "path",
+            "description": "Courier identifier",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourierDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/couriers/meta-info/{courier_id}": {
+      "get": {
+        "tags": [
+          "courier-controller"
+        ],
+        "operationId": "getCourierMetaInfo",
+        "parameters": [
+          {
+            "name": "courier_id",
+            "in": "path",
+            "description": "Courier identifier",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Rating calculation start date",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2023-01-20"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "Rating calculation end date",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2023-01-21"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCourierMetaInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateOrderDto": {
+        "required": [
+          "cost",
+          "delivery_hours",
+          "regions",
+          "weight"
+        ],
+        "type": "object",
+        "properties": {
+          "weight": {
+            "type": "number",
+            "format": "float"
+          },
+          "regions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "delivery_hours": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cost": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateOrderRequest": {
+        "required": [
+          "orders"
+        ],
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateOrderDto"
+            }
+          }
+        }
+      },
+      "OrderDto": {
+        "required": [
+          "cost",
+          "delivery_hours",
+          "order_id",
+          "regions",
+          "weight"
+        ],
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "weight": {
+            "type": "number",
+            "format": "float"
+          },
+          "regions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "delivery_hours": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cost": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Стоимость доставки заказа"
+          },
+          "completed_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GroupOrders": {
+        "required": [
+          "group_order_id",
+          "orders"
+        ],
+        "type": "object",
+        "properties": {
+          "group_order_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderDto"
+            }
+          }
+        }
+      },
+      "CouriersGroupOrders": {
+        "required": [
+          "courier_id",
+          "orders"
+        ],
+        "type": "object",
+        "properties": {
+          "courier_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupOrders"
+            }
+          }
+        }
+      },
+      "OrderAssignResponse": {
+        "required": [
+          "date",
+          "couriers"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "couriers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CouriersGroupOrders"
+            }
+          }
+        }
+      },
+      "BadRequestResponse": {
+        "type": "object"
+      },
+      "CompleteOrder": {
+        "required": [
+          "complete_time",
+          "courier_id",
+          "order_id"
+        ],
+        "type": "object",
+        "properties": {
+          "courier_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "order_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "complete_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CompleteOrderRequestDto": {
+        "required": [
+          "complete_info"
+        ],
+        "type": "object",
+        "properties": {
+          "complete_info": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompleteOrder"
+            }
+          }
+        }
+      },
+      "CreateCourierDto": {
+        "required": [
+          "courier_type",
+          "regions",
+          "working_hours"
+        ],
+        "type": "object",
+        "properties": {
+          "courier_type": {
+            "type": "string",
+            "enum": [
+              "FOOT",
+              "BIKE",
+              "AUTO"
+            ]
+          },
+          "regions": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "working_hours": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateCourierRequest": {
+        "required": [
+          "couriers"
+        ],
+        "type": "object",
+        "properties": {
+          "couriers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateCourierDto"
+            }
+          }
+        }
+      },
+      "CourierDto": {
+        "required": [
+            "courier_id",
+            "courier_type",
+            "regions",
+            "working_hours"
+        ],
+        "type": "object",
+        "properties": {
+            "courier_id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "courier_type": {
+                "type": "string",
+                "enum": [
+                    "FOOT",
+                    "BIKE",
+                    "AUTO"
+                ]
+            },
+            "regions": {
+                "type": "array",
+                "items": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "working_hours": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            }
+        }
+      },
+      "CreateCouriersResponse": {
+        "required": [
+            "couriers"
+        ],
+        "type": "object",
+        "properties": {
+            "couriers": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/CourierDto"
+                }
+            }
+        }
+      },
+      "NotFoundResponse": {
+        "type": "object"
+      },
+      "GetCouriersResponse": {
+        "required": [
+            "couriers",
+            "limit",
+            "offset"
+        ],
+        "type": "object",
+        "properties": {
+            "couriers": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/CourierDto"
+                }
+            },
+            "limit": {
+                "type": "integer",
+                "format": "int32"
+            },
+            "offset": {
+                "type": "integer",
+                "format": "int32"
+            }
+        }
+      },
+      "GetCourierMetaInfoResponse": {
+        "required": [
+          "courier_id",
+          "courier_type",
+          "regions",
+          "working_hours"
+        ],
+        "type": "object",
+        "properties": {
+          "courier_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "courier_type": {
+            "type": "string",
+            "enum": [
+              "FOOT",
+              "BIKE",
+              "AUTO"
+            ]
+          },
+          "regions": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "working_hours": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "earnings": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+#  app:
+#    container_name: app
+#    build:
+#      context: ../
+#      dockerfile: ./build/app/Dockerfile
+#      args:
+#        LOCAL: "true"
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - db
+#    links:
+#      - db
+#    networks:
+#      - enrollment
+
+  db:
+    container_name: db
+    build:
+      context: ../src
+      dockerfile: db/Dockerfile
+      args:
+        LOCAL: "true"
+    restart: always
+    networks:
+      - enrollment
+    ports:
+      - "5432:5432"
+
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "test@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "test123!"
+    ports:
+      - "16543:80"
+    depends_on:
+      - db
+
+networks:
+  enrollment:
+    driver: bridge
