@@ -6,7 +6,7 @@
 - [Продуктовая задача](product/README.md)
 
 ## Архитектура Продуктовой задачи
-![img.png](img.png)
+![img.png](res/app-scheme.png)
 ## Используемые зависимости и тулы
 - [echo](https://github.com/labstack/echo) high performance, minimalist Go web framework. Task included by default 
 - [oapi-codege](https://github.com/deepmap/oapi-codegen) Client and Server Code Generator from the oapi.json
